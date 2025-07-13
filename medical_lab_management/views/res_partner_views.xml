@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Patient Form View -->
+    <record id="view_partner_patient_form" model="ir.ui.view">
+        <field name="name">res.partner.patient.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lab_invoices" type="object" 
+                                class="oe_stat_button" icon="fa-flask"
+                                attrs="{'invisible': [('is_patient', '=', False)]}">
+                            <field name="lab_invoice_count" widget="statinfo" string="Lab Tests"/>
+                        </button>
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_id" readonly="1" attrs="{'invisible': [('is_patient', '=', False)]}"/>
+                        </h1>
+                        <h1>
+                            <field name="name" placeholder="Patient Name" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_patient" invisible="1"/>
+                            <field name="date_of_birth" attrs="{'required': [('is_patient', '=', True)]}"/>
+                            <field name="age_display" attrs="{'invisible': [('date_of_birth', '=', False)]}"/>
+                            <field name="gender" attrs="{'required': [('is_patient', '=', True)]}"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Address">
+                            <group>
+                                <field name="street" placeholder="Street..."/>
+                                <field name="street2" placeholder="Street 2..."/>
+                                <field name="city" placeholder="City"/>
+                                <field name="state_id" placeholder="State"/>
+                                <field name="zip" placeholder="ZIP"/>
+                                <field name="country_id" placeholder="Country"/>
+                            </group>
+                        </page>
+                        <page string="Patient Notes" attrs="{'invisible': [('is_patient', '=', False)]}">
+                            <field name="patient_notes" placeholder="Add any medical history, allergies, or special notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Patient Tree View -->
+    <record id="view_partner_patient_tree" model="ir.ui.view">
+        <field name="name">res.partner.patient.tree</field>
+        <field name="model">res.partner</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <tree string="Patients">
+                <field name="patient_id"/>
+                <field name="name"/>
+                <field name="age_display"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <field name="lab_invoice_count" string="Tests"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Patient Search View -->
+    <record id="view_partner_patient_search" model="ir.ui.view">
+        <field name="name">res.partner.patient.search</field>
+        <field name="model">res.partner</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <search string="Search Patients">
+                <field name="name" string="Patient" filter_domain="['|', '|', ('name', 'ilike', self), ('patient_id', 'ilike', self), ('phone', 'ilike', self)]"/>
+                <field name="patient_id"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <filter string="Male" name="male" domain="[('gender', '=', 'male')]"/>
+                <filter string="Female" name="female" domain="[('gender', '=', 'female')]"/>
+                <separator/>
+                <filter string="Has Tests" name="has_tests" domain="[('lab_invoice_count', '>', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Gender" name="group_gender" context="{'group_by': 'gender'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Doctor Form View -->
+    <record id="view_partner_doctor_form" model="ir.ui.view">
+        <field name="name">res.partner.doctor.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">21</field>
+        <field name="arch" type="xml">
+            <form string="Doctor">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_referred_invoices" type="object" 
+                                class="oe_stat_button" icon="fa-stethoscope"
+                                attrs="{'invisible': [('is_doctor', '=', False)]}">
+                            <field name="referred_invoice_count" widget="statinfo" string="Referrals"/>
+                        </button>
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="doctor_id" readonly="1" attrs="{'invisible': [('is_doctor', '=', False)]}"/>
+                        </h1>
+                        <h1>
+                            <field name="name" placeholder="Doctor Name" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_doctor" invisible="1"/>
+                            <field name="specialization"/>
+                            <field name="license_number"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Address">
+                            <group>
+                                <field name="street" placeholder="Clinic/Hospital Address..."/>
+                                <field name="street2"/>
+                                <field name="city"/>
+                                <field name="state_id"/>
+                                <field name="zip"/>
+                                <field name="country_id"/>
+                            </group>
+                        </page>
+                        <page string="Internal Notes">
+                            <field name="comment" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Doctor Tree View -->
+    <record id="view_partner_doctor_tree" model="ir.ui.view">
+        <field name="name">res.partner.doctor.tree</field>
+        <field name="model">res.partner</field>
+        <field name="priority">21</field>
+        <field name="arch" type="xml">
+            <tree string="Doctors">
+                <field name="doctor_id"/>
+                <field name="name"/>
+                <field name="specialization"/>
+                <field name="license_number"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <field name="referred_invoice_count" string="Referrals"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_lab_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('is_patient', '=', True)]</field>
+        <field name="context">{'default_is_patient': True, 'default_is_company': False}</field>
+        <field name="search_view_id" ref="view_partner_patient_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first patient
+            </p>
+            <p>
+                Register patients who visit your laboratory for tests.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_lab_patient_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_partner_patient_tree"/>
+        <field name="act_window_id" ref="action_lab_patient"/>
+    </record>
+
+    <record id="action_lab_patient_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_partner_patient_form"/>
+        <field name="act_window_id" ref="action_lab_patient"/>
+    </record>
+
+    <record id="action_lab_doctor" model="ir.actions.act_window">
+        <field name="name">Doctors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_doctor', '=', True)]</field>
+        <field name="context">{'default_is_doctor': True, 'default_is_company': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add referring doctors
+            </p>
+            <p>
+                Manage the list of doctors who refer patients to your laboratory.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_lab_doctor_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_partner_doctor_tree"/>
+        <field name="act_window_id" ref="action_lab_doctor"/>
+    </record>
+
+    <record id="action_lab_doctor_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_partner_doctor_form"/>
+        <field name="act_window_id" ref="action_lab_doctor"/>
+    </record>
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Module Category -->
+        <record id="module_category_medical_lab" model="ir.module.category">
+            <field name="name">Medical Laboratory</field>
+            <field name="description">Medical Laboratory Management</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <!-- Lab Reception Group -->
+        <record id="group_lab_reception" model="res.groups">
+            <field name="name">Lab Reception</field>
+            <field name="category_id" ref="module_category_medical_lab"/>
+            <field name="comment">Reception staff who handle patient registration and invoice creation</field>
+        </record>
+
+        <!-- Lab Technician Group -->
+        <record id="group_lab_technician" model="res.groups">
+            <field name="name">Lab Technician</field>
+            <field name="category_id" ref="module_category_medical_lab"/>
+            <field name="implied_ids" eval="[(4, ref('group_lab_reception'))]"/>
+            <field name="comment">Lab technicians who collect samples and enter test results</field>
+        </record>
+
+        <!-- Lab Doctor Group -->
+        <record id="group_lab_doctor" model="res.groups">
+            <field name="name">Lab Doctor</field>
+            <field name="category_id" ref="module_category_medical_lab"/>
+            <field name="implied_ids" eval="[(4, ref('group_lab_technician'))]"/>
+            <field name="comment">Lab doctors who verify and sign test results</field>
+        </record>
+
+        <!-- Lab Manager Group -->
+        <record id="group_lab_manager" model="res.groups">
+            <field name="name">Lab Manager</field>
+            <field name="category_id" ref="module_category_medical_lab"/>
+            <field name="implied_ids" eval="[(4, ref('group_lab_doctor'))]"/>
+            <field name="comment">Lab managers with full access to configuration and reports</field>
+        </record>
+
+        <!-- Record Rules -->
+        
+        <!-- Patients can only be created/edited by Reception and above -->
+        <record id="medical_lab_patient_rule_reception" model="ir.rule">
+            <field name="name">Medical Lab: Patients - Reception and above</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">[('is_patient', '=', True)]</field>
+            <field name="groups" eval="[(4, ref('group_lab_reception'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Doctors can be managed by managers only -->
+        <record id="medical_lab_doctor_rule_manager" model="ir.rule">
+            <field name="name">Medical Lab: Doctors - Managers only</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="domain_force">[('is_doctor', '=', True)]</field>
+            <field name="groups" eval="[(4, ref('group_lab_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Lab Invoices visibility -->
+        <record id="medical_lab_invoice_rule_all" model="ir.rule">
+            <field name="name">Medical Lab: Lab Invoices - All users</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="domain_force">[('is_lab_invoice', '=', True)]</field>
+            <field name="groups" eval="[(4, ref('group_lab_reception'))]"/>
+        </record>
+
+        <!-- Test Results can be edited by technicians and above -->
+        <record id="medical_lab_test_request_rule_technician" model="ir.rule">
+            <field name="name">Medical Lab: Test Requests - Technicians and above</field>
+            <field name="model_id" ref="model_medical_lab_test_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_lab_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+    </data>
+</odoo>
